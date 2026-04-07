@@ -1,425 +1,547 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import { 
+  Dog, 
+  Cat,
+  Search, 
+  MapPin, 
+  Phone, 
+  User, 
+  PlusCircle, 
+  Info, 
+  ShieldCheck, 
+  MessageCircle,
+  Menu,
+  X,
+  ChevronRight,
+  Stethoscope,
+  Scissors,
+  Home as HomeIcon,
+  ShoppingBag,
+  Bone,
+  Instagram,
+  Mail,
+  Send,
+  HelpCircle,
+  Globe,
+  Sparkles,
+  BarChart3,
+  PieChart as PieChartIcon,
+  Zap,
+  Clock,
+  Heart,
+  Activity,
+  Award,
+  CheckCircle2,
+  Users,
+  ArrowRight
+} from 'lucide-react';
 
-<html lang="gu">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lonelylives | નિઃશુલ્ક પાલતુ દત્તક સેવા</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Vadodara:wght@300;400;500;600;700&family=Baloo+Bhai+2:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --nature-green: #2d6a4f;
-            --soft-cream: #f9f7f2;
-            --accent-orange: #fb8500;
-            --glass-bg: rgba(255, 255, 255, 0.75);
-        }
+/**
+ * LONELY LIVES - HOME PAGE ENHANCEMENT
+ * Version: 5.2 (Added How it Works, Stats, and Stories)
+ */
 
-        body {
-            font-family: 'Hind Vadodara', 'Baloo Bhai 2', sans-serif;
-            background: var(--soft-cream);
-            color: #1b4332;
-            overflow-x: hidden;
-            scroll-behavior: smooth;
-        }
+// --- SHARED DATA ---
+const CITIES = ["Nadiad", "Ahmedabad", "Anand", "Surat", "Kheda", "Mahudha", "Vadodara"];
 
-        /* Lightened Leaf Animation */
-        .leaf-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        }
+const MOCK_PETS = [
+  { id: 1, name: "Sheru", type: "Dog", breed: "Indian Pariah", age: "2 Years", gender: "Male", city: "Nadiad", area: "College Road", image: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&q=80&w=800", vaccinated: true },
+  { id: 2, name: "Rani", type: "Dog", breed: "Golden Retriever Mix", age: "1 Year", gender: "Female", city: "Ahmedabad", area: "Satellite", image: "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&q=80&w=800", vaccinated: true },
+  { id: 3, name: "Kalu", type: "Dog", breed: "Labrador", age: "3 Years", gender: "Male", city: "Anand", area: "V.V. Nagar", image: "https://images.unsplash.com/photo-1591769225440-811ad7d62ca2?auto=format&fit=crop&q=80&w=800", vaccinated: false },
+  { id: 4, name: "Mano", type: "Cat", breed: "Indie Cat", age: "6 Months", gender: "Female", city: "Surat", area: "Adajan", image: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&q=80&w=800", vaccinated: true },
+  { id: 5, name: "Bhura", type: "Dog", breed: "Indie", age: "4 Years", gender: "Male", city: "Vadodara", area: "Sayajigunj", image: "https://images.unsplash.com/photo-1561037404-61cd46aa615b?auto=format&fit=crop&q=80&w=800", vaccinated: true },
+  { id: 6, name: "Champa", type: "Cat", breed: "Persian Mix", age: "1.5 Years", gender: "Female", city: "Kheda", area: "Main Bazaar", image: "https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&q=80&w=800", vaccinated: true },
+  { id: 7, name: "Tiger", type: "Dog", breed: "Indie Terrier", age: "2 Years", gender: "Male", city: "Mahudha", area: "Railway Station", image: "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&q=80&w=800", vaccinated: true },
+  { id: 8, name: "Lucy", type: "Cat", breed: "Indie", age: "1 Year", gender: "Female", city: "Nadiad", area: "Piplag Chokdi", image: "https://images.unsplash.com/photo-1495360010541-f48722b34f7d?auto=format&fit=crop&q=80&w=800", vaccinated: false },
+  { id: 11, name: "Golu", type: "Dog", breed: "Indie", age: "8 Months", gender: "Male", city: "Nadiad", area: "Mission Road", image: "https://images.unsplash.com/photo-1541364983171-a8ba01d95cfc?auto=format&fit=crop&q=80&w=800", vaccinated: true },
+];
 
-        .leaf {
-            position: absolute;
-            width: 25px;
-            height: 25px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23d8f3dc"><path d="M17,8C8,10 5.9,16.17 3.82,21.34L5.71,22L6.66,19.7C7.14,19.87 7.64,20 8,20C19,20 22,3 22,3C21,5 14,5.25 9,6.25C4,7.25 2,11.5 2,13.5C2,15.5 3.75,17.25 3.75,17.25C7,8 17,8 17,8Z"/></svg>') no-repeat;
-            opacity: 0.2; 
-            animation: fall linear infinite;
-        }
+const MOCK_FOOD = [
+  { name: "Premium Indie Adult Food", price: "₹899", img: "https://images.unsplash.com/photo-1585499193151-0f50d54c4e1c?auto=format&fit=crop&q=80&w=600" },
+  { name: "Puppy Health Starter", price: "₹1,249", img: "https://images.unsplash.com/photo-1589924691106-073b1381cb35?auto=format&fit=crop&q=80&w=600" },
+  { name: "Cat Wellness Salmon", price: "₹750", img: "https://images.unsplash.com/photo-1548546738-8509cb246ed3?auto=format&fit=crop&q=80&w=600" },
+  { name: "Rescue Vitality Mix", price: "₹599", img: "https://images.unsplash.com/photo-1544333323-c2421448b2ad?auto=format&fit=crop&q=80&w=600" },
+];
 
-        @keyframes fall {
-            0% { transform: translateY(-10vh) rotate(0deg) translateX(0); }
-            50% { transform: translateY(50vh) rotate(180deg) translateX(20px); }
-            100% { transform: translateY(110vh) rotate(360deg) translateX(-20px); }
-        }
+const PROF_SERVICES = [
+  {
+    id: 'grooming',
+    title: 'Pet Grooming',
+    desc: 'Schedule Professional In-Home Grooming Services for Your Cat or Dog',
+    btn: 'Book Pet Grooming →',
+    icon: <Scissors size={32} className="text-pink-500" />,
+    img: 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'boarding',
+    title: 'Pet Boarding',
+    desc: 'Book Trusted Boarding Service for Your Cat or Dog',
+    btn: 'Book Cat and Dog Boarding Service →',
+    icon: <HomeIcon size={32} className="text-pink-500" />,
+    img: 'https://images.unsplash.com/photo-1598133894008-61f7fdb8cc3a?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'walking',
+    title: 'Dog Walking',
+    desc: 'Reserve Personalized Dog Walking Service Near You',
+    btn: 'Book Dog Walking →',
+    icon: <Clock size={32} className="text-pink-500" />,
+    img: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'vet',
+    title: 'Online Vet Consultation',
+    desc: 'Professional Veterinary Service at Your Home or Online',
+    btn: 'Book Online Vet Consultation →',
+    icon: <Stethoscope size={32} className="text-pink-500" />,
+    img: 'https://images.unsplash.com/photo-1576201836106-db1758fd1c97?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'training',
+    title: 'Dog Training',
+    desc: 'Schedule Professional Dog Training Service at Your Home',
+    btn: 'Book Dog Training Service →',
+    icon: <Award size={32} className="text-pink-500" />,
+    img: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'mating',
+    title: 'Pet Mating',
+    desc: 'Find the Perfect Match for Your Pet with Tailored Mating Profiles',
+    btn: 'Explore Pet Mating →',
+    icon: <Heart size={32} className="text-pink-500" />,
+    img: 'https://images.unsplash.com/photo-1591160674255-fc809b1edaa1?auto=format&fit=crop&q=80&w=800'
+  }
+];
 
-        .glass {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.4);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.05);
-        }
+// --- GENERATIVE UI COMPONENTS ---
 
-        .pop-effect {
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+const ContextualSidebar = ({ page }) => {
+  const content = useMemo(() => {
+    switch (page) {
+      case 'adopt': return { 
+        title: "Adoption Glossary", 
+        items: ["Indie: Native Indian breed, highly resilient.", "Fostering: Temporary care before adoption.", "Socialization: Training pets to interact."] 
+      };
+      case 'food': return { 
+        title: "Nutrition Insights", 
+        items: ["Indie diets require 20% protein.", "Avoid high sodium in dry kibble.", "Puppies need 3 meals/day."] 
+      };
+      case 'services': return {
+        title: "Pro Care Services",
+        items: ["Home grooming reduces pet anxiety.", "Walking is vital for heart health.", "Vet consultations solve 80% of issues."]
+      };
+      default: return null;
+    }
+  }, [page]);
 
-        .pop-effect:hover {
-            transform: scale(1.05) translateY(-5px);
-            box-shadow: 0 15px 30px rgba(45, 106, 79, 0.15);
-        }
+  if (!content) return null;
 
-        .nav-link:after {
-            content: '';
-            display: block;
-            width: 0;
-            height: 2px;
-            background: var(--accent-orange);
-            transition: width .3s;
-        }
-        .nav-link:hover:after { width: 100%; }
-
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(8px);
-            z-index: 100;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .modal.active { display: flex; animation: fadeIn 0.3s ease; }
-        
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .floating-donate {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            z-index: 40;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(251, 133, 0, 0.7); }
-            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(251, 133, 0, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(251, 133, 0, 0); }
-        }
-    </style>
-</head>
-<body>
-
-    <div class="leaf-container" id="leafContainer"></div>
-
-    <!-- Floating Donate Button -->
-    <button onclick="openModal('donateModal')" class="floating-donate bg-orange-500 text-white p-4 rounded-full shadow-2xl flex items-center gap-2 font-bold md:px-6">
-        <i class="fas fa-hand-holding-heart text-xl"></i>
-        <span class="hidden md:inline">દાન કરો (Donate)</span>
-    </button>
-
-    <!-- Header -->
-    <header class="fixed w-full top-0 z-50 px-4 py-3">
-        <div class="max-w-6xl mx-auto glass rounded-full px-6 py-2 flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <div class="bg-orange-500 p-2 rounded-full text-white">
-                    <i class="fas fa-paw"></i>
-                </div>
-                <h1 class="text-xl font-extrabold text-green-900">Lonelylives</h1>
-            </div>
-            
-            <nav class="hidden md:flex gap-8 font-semibold text-green-800">
-                <a href="#home" class="nav-link">હોમ</a>
-                <a href="#adopt" class="nav-link">દત્તક લો</a>
-                <a href="#branches" class="nav-link">શાખાઓ</a>
-                <a href="#donate-section" class="nav-link">દાન કરો</a>
-                <a href="#services" class="nav-link">સેવાઓ</a>
-                <a href="#food" class="nav-link">ખોરાક</a>
-            </nav>
-
-            <button onclick="openModal('authModal')" class="bg-orange-500 text-white px-6 py-2 rounded-full font-bold shadow-lg hover:bg-orange-600 transition">
-                લોગઈન
-            </button>
-        </div>
-    </header>
-
-    <!-- Hero Section -->
-    <section id="home" class="pt-32 pb-16 px-6 min-h-screen flex items-center relative overflow-hidden">
-        <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center relative z-10">
-            <div>
-                <span class="inline-block bg-orange-100 text-orange-700 px-4 py-1 rounded-full text-sm font-bold mb-4">#AdoptLove ❤️</span>
-                <h2 class="text-5xl md:text-6xl font-black text-green-900 mb-6 leading-tight">પ્રેમને દત્તક લો,<br>જીવન બચાવો.</h2>
-                <p class="text-lg text-green-800 mb-8 leading-relaxed">
-                    ભારતમાં દરરોજ અંદાજે ૧૪૭૮ કૂતરા અને બિલાડીઓ રસ્તા પર મૃત્યુ પામે છે. અમારું લક્ષ્ય ૨૦૩૫ સુધીમાં દરેક અનાથ પ્રાણીને ઘર આપવાનું છે. નડિયાદ અને આસપાસના વિસ્તારોમાં અમારી સાથે જોડાઈને પુણ્યનું કામ કરો.
-                </p>
-                <div class="flex flex-wrap gap-4">
-                    <a href="#adopt" class="bg-green-700 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-xl hover:bg-green-800 transition pop-effect">
-                        પ્રાણી શોધો
-                    </a>
-                    <button onclick="openModal('donateModal')" class="bg-orange-500 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-xl hover:bg-orange-600 transition pop-effect">
-                        મદદ કરો (Donate)
-                    </button>
-                </div>
-            </div>
-            <div class="relative">
-                <div class="glass p-4 rounded-[40px] rotate-3 overflow-hidden shadow-2xl">
-                    <img src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=800" alt="Pet" class="rounded-[30px] w-full">
-                </div>
-                <div class="absolute -bottom-10 -left-10 glass p-6 rounded-3xl -rotate-6 hidden md:block">
-                    <p class="text-orange-600 font-bold text-lg">"ગોલુ" દત્તક લેવાયો!</ 🎉</p>
-                    <p class="text-sm text-green-700">નડિયાદ, ૨ કલાક પહેલા</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Branches Section -->
-    <section id="branches" class="py-20 px-6">
-        <div class="max-w-6xl mx-auto">
-            <h3 class="text-3xl font-black text-green-900 text-center mb-12">અમારી શાખાઓ (Our Branches)</h3>
-            <div class="grid md:grid-cols-2 gap-8">
-                <div class="glass p-8 rounded-[40px] border-b-4 border-green-700 pop-effect">
-                    <div class="flex items-center gap-4 mb-4">
-                        <i class="fas fa-map-marker-alt text-3xl text-orange-500"></i>
-                        <h4 class="text-2xl font-bold text-green-900">નડિયાદ હેડ ઓફિસ</h4>
-                    </div>
-                    <p class="text-green-800 mb-4">સંતરામ રોડ, પીપલગ ચોકડી પાસે, નડિયાદ, ગુજરાત.</p>
-                    <a href="https://wa.me/9313529202" class="text-green-700 font-bold">લોકેશન જુઓ →</a>
-                </div>
-                <div class="glass p-8 rounded-[40px] border-b-4 border-orange-500 pop-effect">
-                    <div class="flex items-center gap-4 mb-4">
-                        <i class="fas fa-map-marker-alt text-3xl text-orange-500"></i>
-                        <h4 class="text-2xl font-bold text-green-900">આણંદ સેન્ટર</h4>
-                    </div>
-                    <p class="text-green-800 mb-4">વી.વી. નગર, મોટુ બજાર પાસે, આણંદ, ગુજરાત.</p>
-                    <a href="https://wa.me/9313529202" class="text-green-700 font-bold">લોકેશન જુઓ →</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Donation Section -->
-    <section id="donate-section" class="py-20 px-6">
-        <div class="max-w-6xl mx-auto glass p-10 rounded-[50px] border-l-8 border-orange-500 grid md:grid-cols-2 gap-10 items-center">
-            <div>
-                <h3 class="text-3xl font-black text-green-900 mb-4">મદદનો હાથ લંબાવો 🙏</h3>
-                <p class="text-green-800 mb-6">
-                    તમારું નાનું અમથું દાન પણ કોઈ અબોલ જીવ માટે ખોરાક, દવા અને ઘર બની શકે છે. તમે તમારી મરજી મુજબ કોઈ પણ રકમ દાન કરી શકો છો. ₹૧૦ થી શરૂ કરીને તમે જે યોગ્ય લાગે તે રકમ આપી શકો છો.
-                </p>
-                <button onclick="openModal('donateModal')" class="w-full bg-green-900 text-white py-4 rounded-2xl font-bold pop-effect">
-                    દાન કરવા માટે અહીં ક્લિક કરો
-                </button>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-                <img src="https://images.unsplash.com/photo-1597633425046-08f5110420b5?auto=format&fit=crop&q=80&w=300" class="rounded-3xl shadow-lg" alt="Rescue">
-                <img src="https://images.unsplash.com/photo-1544191714-343513a86370?auto=format&fit=crop&q=80&w=300" class="rounded-3xl shadow-lg mt-8" alt="Food">
-            </div>
-        </div>
-    </section>
-
-    <!-- How it works -->
-    <section class="py-20 px-6 bg-white/50">
-        <div class="max-w-6xl mx-auto text-center">
-            <h3 class="text-3xl font-black mb-16 text-green-900">આ કેવી રીતે કામ કરે છે?</h3>
-            <div class="grid md:grid-cols-3 gap-10">
-                <div class="glass p-8 rounded-3xl pop-effect">
-                    <div class="w-16 h-16 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-6">
-                        <i class="fas fa-search"></i>
-                    </div>
-                    <h4 class="text-xl font-bold mb-4">શોધો</h4>
-                    <p class="text-green-800">તમારા શહેરનું નામ લખીને તમારી પસંદગીનું પ્રાણી શોધો.</p>
-                </div>
-                <div class="glass p-8 rounded-3xl pop-effect">
-                    <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-6">
-                        <i class="fas fa-handshake"></i>
-                    </div>
-                    <h4 class="text-xl font-bold mb-4">મુલાકાત</h4>
-                    <p class="text-green-800">માલિક સાથે વાત કરી મુલાકાતનો સમય નક્કી કરો.</p>
-                </div>
-                <div class="glass p-8 rounded-3xl pop-effect">
-                    <div class="w-16 h-16 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-6">
-                        <i class="fas fa-heart"></i>
-                    </div>
-                    <h4 class="text-xl font-bold mb-4">દત્તક લો</h4>
-                    <p class="text-green-800">પ્રક્રિયા પૂર્ણ કરી નવા મિત્રને ઘરે લઈ જાઓ.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Pet Grid -->
-    <section id="adopt" class="py-20 px-6">
-        <div class="max-w-6xl mx-auto">
-            <div class="flex justify-between items-end mb-12">
-                <div>
-                    <h3 class="text-3xl font-black text-green-900">નવા મિત્રોને મળો</h3>
-                    <p class="text-green-700">નડિયાદ અને આસપાસના વિસ્તારના પ્રાણીઓ</p>
-                </div>
-            </div>
-            <div id="petGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                <!-- JavaScript handles this -->
-            </div>
-        </div>
-    </section>
-
-    <!-- Services Section -->
-    <section id="services" class="py-20 px-6 bg-green-900 text-white rounded-[60px] mx-4 mb-20 shadow-2xl">
-        <div class="max-w-6xl mx-auto text-center">
-            <h3 class="text-4xl font-black mb-16">અમારી ખાસ સેવાઓ</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
-                <div class="bg-white/10 p-8 rounded-3xl hover:bg-white/20 transition cursor-pointer pop-effect">
-                    <i class="fas fa-cut text-4xl text-orange-400 mb-6"></i>
-                    <h4 class="text-xl font-bold mb-2">પેટ ગ્રૂમિંગ</h4>
-                    <p class="text-green-100 text-sm mb-4">ઘરે આવીને નવડાવવા અને સાફ-સફાઈ કરવાની સેવા.</p>
-                    <button onclick="openModal('serviceModal')" class="text-orange-400 font-bold">બુક કરો →</button>
-                </div>
-                <div class="bg-white/10 p-8 rounded-3xl hover:bg-white/20 transition cursor-pointer pop-effect">
-                    <i class="fas fa-stethoscope text-4xl text-orange-400 mb-6"></i>
-                    <h4 class="text-xl font-bold mb-2">ઓનલાઈન ડોક્ટર</h4>
-                    <p class="text-green-100 text-sm mb-4">ગમે ત્યારે નિષ્ણાત ડોક્ટરની સલાહ મેળવો.</p>
-                    <button onclick="openModal('serviceModal')" class="text-orange-400 font-bold">વાત કરો →</button>
-                </div>
-                <div class="bg-white/10 p-8 rounded-3xl hover:bg-white/20 transition cursor-pointer pop-effect">
-                    <i class="fas fa-dog text-4xl text-orange-400 mb-6"></i>
-                    <h4 class="text-xl font-bold mb-2">ટ્રેનિંગ સેવા</h4>
-                    <p class="text-green-100 text-sm mb-4">તમારા પાલતુ પ્રાણીને પ્રોફેશનલ ટ્રેનિંગ આપો.</p>
-                    <button onclick="openModal('serviceModal')" class="text-orange-400 font-bold">બુક કરો →</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Pet Food Section -->
-    <section id="food" class="py-20 px-6">
-        <div class="max-w-6xl mx-auto text-center">
-            <h3 class="text-3xl font-black mb-16 text-green-900">પૌષ્ટિક આહાર</h3>
-            <div id="foodGrid" class="grid md:grid-cols-3 gap-8">
-                <!-- JS handles this -->
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-green-950 text-white py-20 px-6">
-        <div class="max-w-6xl mx-auto grid md:grid-cols-4 gap-12">
-            <div class="col-span-2">
-                <div class="flex items-center gap-2 mb-6">
-                    <div class="bg-orange-500 p-2 rounded-full"><i class="fas fa-paw"></i></div>
-                    <span class="text-2xl font-black">Lonelylives</span>
-                </div>
-                <p class="text-green-200 max-w-sm">ગુજરાતના દરેક અનાથ પ્રાણીને ઘર અપાવવા માટે કટિબદ્ધ. નડિયાદ સ્થિત સેવા કેન્દ્ર.</p>
-            </div>
-            <div>
-                <h5 class="font-bold mb-6">ઝડપી લિંક્સ</h5>
-                <ul class="space-y-3 text-green-200 text-sm">
-                    <li><a href="#adopt">દત્તક લો</a></li>
-                    <li><a href="#branches">શાખાઓ</a></li>
-                    <li><a href="#donate-section">દાન કરો</a></li>
-                </ul>
-            </div>
-            <div>
-                <h5 class="font-bold mb-6">સંપર્ક</h5>
-                <p class="text-green-200 text-sm mb-2">+91 9313529202</p>
-                <p class="text-green-200 text-sm">bhautikc367@gmail.com</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Modals -->
-    <div id="donateModal" class="modal" onclick="closeModalOnOuterClick(event, 'donateModal')">
-        <div class="bg-white p-10 rounded-[40px] max-w-md w-full text-center relative glass">
-            <div class="w-20 h-20 bg-orange-100 text-orange-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-6">
-                <i class="fas fa-heart"></i>
-            </div>
-            <h2 class="text-2xl font-black text-green-900 mb-2">દાન કરો</h2>
-            <p class="text-green-700 mb-8 text-sm">તમારી રકમ કોઈ અબોલ જીવ માટે મદદરૂપ થશે.</p>
-            <div class="relative mb-6">
-                <span class="absolute left-4 top-4 font-bold text-gray-500">₹</span>
-                <input type="number" id="donateAmount" placeholder="રકમ (₹૧૦ થી ગમે તેટલા)" min="10" 
-                    class="w-full p-4 pl-10 rounded-2xl bg-gray-100 outline-none focus:ring-2 ring-orange-400 font-bold text-xl">
-            </div>
-            <button onclick="submitDonation()" class="w-full bg-orange-500 text-white py-4 rounded-2xl font-bold shadow-lg mb-4 hover:bg-orange-600 transition">GPay / PhonePe દ્વારા દાન</button>
-            <button onclick="closeModal('donateModal')" class="text-gray-400 font-bold">પાછા જાઓ</button>
-        </div>
+  return (
+    <div className="fixed right-6 top-32 w-64 bg-white/80 backdrop-blur border border-pink-100 rounded-[32px] p-6 shadow-xl hidden xl:block animate-slide-in">
+      <div className="flex items-center gap-2 mb-4 text-pink-500">
+        <Sparkles size={18} />
+        <h4 className="font-black text-sm uppercase tracking-wider">{content.title}</h4>
+      </div>
+      <ul className="space-y-4">
+        {content.items.map((item, i) => (
+          <li key={i} className="text-xs text-slate-600 leading-relaxed bg-pink-50/50 p-3 rounded-2xl">
+            {item}
+          </li>
+        ))}
+      </ul>
     </div>
+  );
+};
 
-    <div id="authModal" class="modal" onclick="closeModalOnOuterClick(event, 'authModal')"><div class="bg-white p-10 rounded-[40px] max-w-md w-full text-center glass"><h2 class="text-2xl font-black mb-6">લોગઈન કરો</h2><input type="text" placeholder="નંબર" class="w-full p-4 mb-4 rounded-2xl bg-gray-100"><button class="w-full bg-orange-500 text-white py-4 rounded-2xl font-bold">ઓટીપી મોકલો</button></div></div>
-    <div id="adoptModal" class="modal" onclick="closeModalOnOuterClick(event, 'adoptModal')"><div class="bg-white p-10 rounded-[40px] max-w-md w-full text-center glass"><div id="petInfo"></div><div class="mt-8 flex flex-col gap-4"><a id="wpAction" href="#" class="w-full bg-green-600 text-white py-4 rounded-2xl font-bold">WhatsApp સંપર્ક</a><button onclick="closeModal('adoptModal')" class="text-gray-500 font-bold">રદ કરો</button></div></div></div>
-    <div id="serviceModal" class="modal" onclick="closeModalOnOuterClick(event, 'serviceModal')"><div class="bg-white p-10 rounded-[40px] max-w-md w-full text-center glass"><h2 class="text-2xl font-black mb-4">એપોઈન્ટમેન્ટ</h2><a href="tel:9313529202" class="w-full bg-green-800 text-white py-4 rounded-2xl block font-bold">કોલ કરો: 9313529202</a></div></div>
+const SmartSearch = () => {
+  const [query, setQuery] = useState("");
+  const [result, setResult] = useState(null);
+  const [isSearching, setIsSearching] = useState(false);
 
-    <script>
-        const leafContainer = document.getElementById('leafContainer');
-        function createLeaf() {
-            const leaf = document.createElement('div');
-            leaf.classList.add('leaf');
-            leaf.style.left = Math.random() * 100 + 'vw';
-            leaf.style.animationDuration = Math.random() * 5 + 7 + 's';
-            leafContainer.appendChild(leaf);
-            setTimeout(() => leaf.remove(), 12000);
-        }
-        setInterval(createLeaf, 600);
+  const handleSearch = () => {
+    if (!query) return;
+    setIsSearching(true);
+    setTimeout(() => {
+      setResult(`For "${query}", you might like to explore our Professional Services like Vet Consultation or Training to ensure the best care.`);
+      setIsSearching(false);
+    }, 1500);
+  };
 
-        const pets = [
-            { id: 1, name: "શેરુ", age: "૨ વર્ષ", location: "સંતરામ રોડ, નડિયાદ", img: "https://images.unsplash.com/photo-1583512603805-3cc6b41f3edb?auto=format&fit=crop&q=80&w=400", type: "કૂતરો" },
-            { id: 2, name: "માનો", age: "૬ મહિના", location: "વી.વી. નગર, આણંદ", img: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&q=80&w=400", type: "બિલાડી" },
-            { id: 3, name: "બ્રુનો", age: "૧ વર્ષ", location: "પીપલગ, નડિયાદ", img: "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&q=80&w=400", type: "કૂતરો" },
-            { id: 4, name: "મોતી", age: "૫ વર્ષ", location: "સ્ટેશન રોડ, નડિયાદ", img: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=400", type: "કૂતરો" }
-        ];
+  return (
+    <div className="max-w-2xl mx-auto mb-20 animate-popup">
+      <div className="relative group">
+        <input 
+          type="text" 
+          placeholder="Search for pets or services..."
+          className="w-full bg-white border-2 border-slate-100 py-6 px-8 rounded-[32px] text-lg outline-none focus:border-pink-400 transition-all shadow-xl"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+        />
+        <button 
+          onClick={handleSearch}
+          className="absolute right-4 top-1/2 -translate-y-1/2 bg-pink-500 text-white p-4 rounded-2xl transition-all"
+        >
+          {isSearching ? <Zap size={24} className="animate-spin" /> : <Search size={24} />}
+        </button>
+      </div>
+      {result && (
+        <div className="mt-6 bg-white p-8 rounded-[32px] border border-pink-100 shadow-lg animate-slide-in">
+          <p className="text-slate-700 leading-relaxed font-medium">{result}</p>
+        </div>
+      )}
+    </div>
+  );
+};
 
-        const foods = [
-            { name: "પ્રીમિયમ ડોગ ફૂડ", price: "₹૮૫૦", img: "https://images.unsplash.com/photo-1568640347023-a616a30bc3bd?auto=format&fit=crop&q=80&w=400" },
-            { name: "કેટ બિસ્કિટ", price: "₹૪૦૦", img: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&q=80&w=400" }
-        ];
+// --- CORE LAYOUT ---
 
-        function renderUI() {
-            document.getElementById('petGrid').innerHTML = pets.map(pet => `
-                <div class="glass rounded-[40px] overflow-hidden pop-effect">
-                    <img src="${pet.img}" class="w-full h-48 object-cover">
-                    <div class="p-6">
-                        <div class="flex justify-between mb-2"><span class="font-black text-xl text-green-900">${pet.name}</span><span class="text-orange-600 font-bold">${pet.age}</span></div>
-                        <p class="text-sm text-green-700 mb-6"><i class="fas fa-map-marker-alt"></i> ${pet.location}</p>
-                        <button onclick="showAdopt(${pet.id})" class="w-full bg-green-700 text-white py-3 rounded-2xl font-bold">દત્તક લો</button>
-                    </div>
-                </div>
-            `).join('');
+const Navbar = ({ currentPage, setPage }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const navItems = ['home', 'adopt', 'rehome', 'food', 'services'];
 
-            document.getElementById('foodGrid').innerHTML = foods.map(food => `
-                <div class="glass p-6 rounded-[40px] text-center pop-effect">
-                    <img src="${food.img}" class="w-40 h-40 object-cover mx-auto rounded-3xl mb-4 shadow-lg">
-                    <h4 class="text-lg font-bold">${food.name}</h4>
-                    <p class="text-orange-600 font-black text-xl my-2">${food.price}</p>
-                    <button onclick="window.location.href='https://wa.me/9313529202?text=I want to order ${food.name}'" class="text-green-700 font-bold border-2 border-green-700 px-6 py-2 rounded-xl">ઓર્ડર કરો</button>
-                </div>
-            `).join('');
-        }
+  return (
+    <nav className="sticky top-0 z-50 bg-white/70 backdrop-blur-md border-b border-pink-100 px-6 py-4 flex justify-between items-center animate-slide-in">
+      <div className="flex items-center gap-2 cursor-pointer" onClick={() => setPage('home')}>
+        <div className="bg-pink-500 p-2 rounded-xl text-white shadow-lg shadow-pink-200 animate-popup">
+          <Dog fill="currentColor" size={24} />
+        </div>
+        <span className="text-xl font-bold bg-gradient-to-r from-pink-600 to-orange-500 bg-clip-text text-transparent">
+          Lonelylives
+        </span>
+      </div>
+      <div className="hidden lg:flex gap-8 font-medium text-slate-600">
+        {navItems.map((item) => (
+          <button key={item} onClick={() => setPage(item)} className={`capitalize hover:text-pink-500 transition-all hover:scale-110 active:scale-95 ${currentPage === item ? 'text-pink-600 font-bold' : ''}`}>
+            {item}
+          </button>
+        ))}
+      </div>
+      <div className="flex items-center gap-4">
+        <button onClick={() => setPage('signin')} className="hidden md:flex items-center gap-2 bg-pink-500 text-white px-5 py-2.5 rounded-full font-semibold hover:bg-pink-600 transition-all shadow-md hover:scale-105 active:scale-95 animate-popup">
+          <User size={18} /> Sign In
+        </button>
+        <button className="lg:hidden" onClick={() => setIsOpen(!isOpen)}>
+          {isOpen ? <X /> : <Menu />}
+        </button>
+      </div>
+      {isOpen && (
+        <div className="absolute top-full left-0 w-full bg-white border-b border-pink-100 p-6 flex flex-col gap-4 lg:hidden shadow-xl animate-slide-in">
+          {navItems.map((item) => (
+            <button key={item} onClick={() => {setPage(item); setIsOpen(false)}} className="capitalize text-left text-lg py-2 border-b border-slate-50">{item}</button>
+          ))}
+          <button onClick={() => setPage('signin')} className="bg-pink-500 text-white p-3 rounded-xl font-semibold">Sign In</button>
+        </div>
+      )}
+    </nav>
+  );
+};
 
-        function openModal(id) { document.getElementById(id).classList.add('active'); }
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-        function closeModalOnOuterClick(e, id) { if(e.target.id === id) closeModal(id); }
+// --- PAGES ---
 
-        function submitDonation() {
-            const amount = document.getElementById('donateAmount').value;
-            if (!amount || amount < 10) {
-                const msg = document.createElement('div');
-                msg.className = 'fixed top-10 left-1/2 -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-xl z-[200] shadow-xl';
-                msg.innerText = "કૃપા કરીને ઓછામાં ઓછી ₹૧૦ ની રકમ લખો.";
-                document.body.appendChild(msg);
-                setTimeout(() => msg.remove(), 3000);
-                return;
-            }
-            window.open(`https://wa.me/9313529202?text=I want to donate ₹${amount} to Lonelylives.`, '_blank');
-        }
+const HomePage = ({ setPage }) => (
+  <div className="relative overflow-hidden">
+    {/* HERO SECTION */}
+    <section className="relative pt-20 pb-32 px-6">
+      <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+        <div className="z-10 animate-slide-in">
+          <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur px-4 py-2 rounded-full text-pink-600 font-bold text-sm mb-6 border border-pink-50 animate-popup">
+            <span className="animate-pulse">●</span> તમારો નવો સાથી અહી છે
+          </div>
+          <h1 className="text-6xl md:text-8xl font-black text-slate-800 leading-[1.1] mb-8">Adopt Love, <br/><span className="text-pink-500">Save Lives.</span></h1>
+          <p className="text-xl text-slate-600 mb-10 max-w-lg leading-relaxed">Find your perfect companion in Gujarat. Every adoption saves a life.</p>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <button onClick={() => setPage('adopt')} className="bg-pink-500 text-white px-10 py-5 rounded-3xl font-black text-xl hover:shadow-xl transition-all hover:scale-105 active:scale-95 animate-popup">Adopt a Pet</button>
+            <button onClick={() => setPage('services')} className="bg-white text-slate-800 px-10 py-5 rounded-3xl font-black text-xl border-2 border-slate-100 hover:border-pink-200 transition-all hover:scale-105 active:scale-95 animate-popup">Our Services</button>
+          </div>
+        </div>
+        <div className="relative animate-popup"><img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&q=80&w=1000" className="rounded-[60px] shadow-2xl w-full object-cover h-[600px]" alt="Happy Dog" /></div>
+      </div>
+    </section>
 
-        function showAdopt(id) {
-            const pet = pets.find(p => p.id === id);
-            document.getElementById('petInfo').innerHTML = `
-                <img src="${pet.img}" class="w-32 h-32 rounded-full mx-auto object-cover border-4 border-orange-200 mb-4 shadow-xl">
-                <h3 class="text-2xl font-black text-green-900">${pet.name} ને મળો</h3>
-                <p class="text-green-700">${pet.age} • ${pet.location}</p>
-            `;
-            document.getElementById('wpAction').href = `https://wa.me/9313529202?text=I want to adopt ${pet.name}.`;
-            openModal('adoptModal');
-        }
+    {/* IMPACT BANNER */}
+    <section className="bg-pink-500 py-24 px-6 text-white text-center">
+      <div className="max-w-4xl mx-auto animate-slide-in">
+        <p className="text-3xl md:text-4xl font-black mb-8 leading-tight">Approximately 1478 dogs & cats die every day on roads in India.</p>
+        <p className="text-pink-100 text-xl leading-relaxed font-bold italic">"Lonelylives: Giving every stray a story with a happy ending."</p>
+      </div>
+    </section>
 
-        window.onload = renderUI;
-    </script>
-</body>
-</html>
+    {/* HOW IT WORKS */}
+    <section className="py-32 px-6 max-w-7xl mx-auto">
+      <div className="text-center mb-20 animate-slide-in">
+        <h2 className="text-5xl font-black text-slate-800 mb-4">How it <span className="text-pink-500">Works</span></h2>
+        <p className="text-slate-500 text-lg">Your journey to a new best friend is just three steps away.</p>
+      </div>
+      <div className="grid md:grid-cols-3 gap-12">
+        {[
+          { icon: <Search size={40} />, title: "Search", desc: "Browse through our verified listings of local pets waiting for a home." },
+          { icon: <MessageCircle size={40} />, title: "Connect", desc: "Talk to the current owners or rescuers to learn more about the pet." },
+          { icon: <Heart size={40} />, title: "Adopt", desc: "Complete the process and welcome your new family member home." }
+        ].map((step, idx) => (
+          <div key={idx} className="bg-white p-10 rounded-[40px] border border-pink-50 shadow-sm hover:shadow-xl transition-all text-center animate-popup">
+            <div className="bg-pink-50 w-20 h-20 rounded-3xl flex items-center justify-center text-pink-500 mx-auto mb-8">{step.icon}</div>
+            <h3 className="text-2xl font-black mb-4">{step.title}</h3>
+            <p className="text-slate-500 leading-relaxed">{step.desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    {/* STATISTICS DASHBOARD */}
+    <section className="bg-slate-900 py-32 px-6 rounded-[80px] mx-4 mb-32 overflow-hidden relative">
+      <div className="absolute top-0 right-0 opacity-10 pointer-events-none transform translate-x-1/2 -translate-y-1/4">
+        <Dog size={600} />
+      </div>
+      <div className="max-w-7xl mx-auto relative z-10 text-center lg:text-left grid lg:grid-cols-2 gap-20 items-center">
+        <div>
+          <h2 className="text-5xl font-black text-white mb-8">Our Real-time <br/><span className="text-pink-400">Impact Dashboard</span></h2>
+          <p className="text-slate-400 text-lg mb-12 max-w-md">We believe in transparency. Here is how the community is growing in Gujarat.</p>
+          <div className="grid grid-cols-2 gap-8">
+            <div className="bg-white/5 backdrop-blur p-8 rounded-3xl border border-white/10">
+              <p className="text-pink-400 text-4xl font-black mb-2">450+</p>
+              <p className="text-slate-300 font-bold">Pets Adopted</p>
+            </div>
+            <div className="bg-white/5 backdrop-blur p-8 rounded-3xl border border-white/10">
+              <p className="text-pink-400 text-4xl font-black mb-2">1.2k</p>
+              <p className="text-slate-300 font-bold">Active Users</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white/10 backdrop-blur-xl p-12 rounded-[50px] border border-white/20">
+          <div className="flex items-center justify-between mb-8">
+            <h4 className="text-white font-bold text-xl flex items-center gap-2"><BarChart3 size={20}/> Adoption Trends</h4>
+            <span className="text-xs text-slate-400 uppercase tracking-widest">Gujarat Region</span>
+          </div>
+          <div className="flex items-end gap-4 h-48 mb-8">
+            {[40, 70, 45, 90, 65, 80, 100].map((h, i) => (
+              <div key={i} className="flex-1 bg-gradient-to-t from-pink-500 to-orange-400 rounded-t-xl" style={{height: `${h}%`}}></div>
+            ))}
+          </div>
+          <div className="flex justify-between text-slate-500 text-xs font-bold px-2">
+            <span>MON</span><span>WED</span><span>FRI</span><span>SUN</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {/* SUCCESS STORIES */}
+    <section className="py-32 px-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+          <div className="animate-slide-in">
+            <h2 className="text-5xl font-black text-slate-800 mb-4">Happy <span className="text-pink-500">Tails</span></h2>
+            <p className="text-slate-500 text-lg">Heartwarming stories from our local community members.</p>
+          </div>
+          <button className="flex items-center gap-2 font-black text-pink-500 hover:gap-4 transition-all">View All Stories <ArrowRight size={20}/></button>
+        </div>
+        <div className="grid md:grid-cols-2 gap-10">
+          {[
+            { name: "Priya & Bruno", story: "Bruno was a stray in Nadiad with a broken leg. Now he's the king of my house and my best friend.", img: "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&q=80&w=800" },
+            { name: "The Mehta Family", story: "Adopting an older dog was the best decision we ever made. Bella is calm, loving, and perfect for us.", img: "https://images.unsplash.com/photo-1544333323-c2421448b2ad?auto=format&fit=crop&q=80&w=800" }
+          ].map((s, idx) => (
+            <div key={idx} className="flex flex-col lg:flex-row bg-white rounded-[50px] border border-pink-50 overflow-hidden shadow-sm hover:shadow-xl transition-all animate-popup">
+              <div className="lg:w-1/2 h-64 lg:h-auto"><img src={s.img} className="w-full h-full object-cover" alt="Story" /></div>
+              <div className="p-10 lg:w-1/2 flex flex-col justify-center">
+                <div className="flex gap-1 text-orange-400 mb-4">{'★★★★★'.split('').map((star, i) => <span key={i}>{star}</span>)}</div>
+                <p className="text-slate-600 italic mb-8 leading-relaxed">"{s.story}"</p>
+                <h4 className="font-black text-xl text-slate-800">— {s.name}</h4>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  </div>
+);
+
+const ServicesPage = () => (
+  <div className="max-w-7xl mx-auto px-6 py-20 relative">
+    <div className="text-center mb-20 animate-slide-in">
+      <h1 className="text-5xl md:text-7xl font-black text-slate-800 mb-6">Book Pet Care Service <br/><span className="text-pink-500">With ThePetNest</span></h1>
+      <p className="text-xl text-slate-500 max-w-2xl mx-auto">Premium, professional care for your companions, delivered by experts.</p>
+    </div>
+    
+    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+      {PROF_SERVICES.map((s) => (
+        <div key={s.id} className="group bg-white rounded-[40px] border border-pink-50 overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 animate-popup">
+          <div className="h-64 overflow-hidden relative">
+            <img src={s.img} alt={s.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+            <div className="absolute top-6 left-6 bg-white p-4 rounded-3xl shadow-xl">{s.icon}</div>
+          </div>
+          <div className="p-10">
+            <h3 className="text-2xl font-black text-slate-800 mb-4">{s.title}</h3>
+            <p className="text-slate-500 font-medium mb-10 leading-relaxed min-h-[3.5rem]">{s.desc}</p>
+            <button className="w-full bg-pink-500 text-white py-4 rounded-2xl font-bold text-lg hover:bg-pink-600 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2">
+              {s.btn}
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+const AdoptPage = ({ onSelectPet }) => (
+  <div className="max-w-7xl mx-auto px-6 py-12">
+    <SmartSearch />
+    <h1 className="text-6xl font-black text-slate-800 mb-16 animate-slide-in">Pets Near You</h1>
+    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+      {MOCK_PETS.map(pet => (
+        <div key={pet.id} onClick={() => onSelectPet(pet)} className="group bg-white rounded-[40px] border border-white shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer animate-popup overflow-hidden">
+          <div className="h-64 overflow-hidden relative">
+            <img src={pet.image} alt={pet.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+          </div>
+          <div className="p-8 text-center">
+            <h3 className="text-2xl font-black text-slate-800 mb-1">{pet.name}</h3>
+            <p className="text-slate-500 text-sm mb-6">{pet.breed} • {pet.age}</p>
+            <button className="w-full bg-pink-50 text-pink-600 py-3 rounded-2xl font-bold hover:bg-pink-500 hover:text-white transition-all transform active:scale-95">Adopt Now</button>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+const FoodPage = () => (
+  <div className="max-w-7xl mx-auto px-6 py-12">
+    <h1 className="text-6xl font-black text-slate-800 mb-16 animate-slide-in">Nutritious Food</h1>
+    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
+      {MOCK_FOOD.map((p, i) => (
+        <div key={i} className="bg-white rounded-[40px] overflow-hidden border border-slate-100 hover:shadow-2xl transition-all animate-popup group cursor-pointer">
+          <div className="h-72 overflow-hidden"><img src={p.img} alt={p.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" /></div>
+          <div className="p-8">
+            <h3 className="font-black text-slate-800 mb-2 text-xl">{p.name}</h3>
+            <p className="text-pink-600 font-black text-2xl mb-6">{p.price}</p>
+            <button className="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold hover:bg-pink-500 transition-all flex items-center justify-center gap-2 group-active:scale-95"><ShoppingBag size={18}/> Add to Cart</button>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+const RehomePage = () => (
+  <div className="max-w-4xl mx-auto px-6 py-12">
+    <div className="bg-white rounded-[60px] shadow-2xl p-16 border border-pink-50 animate-slide-in">
+      <h1 className="text-5xl font-black mb-10">Rehome a Pet</h1>
+      <form className="space-y-10" onSubmit={(e) => e.preventDefault()}>
+        <div className="grid md:grid-cols-2 gap-10">
+          <input placeholder="Pet Name" className="w-full bg-slate-50 border-none rounded-2xl p-5 outline-none" />
+          <select className="w-full bg-slate-50 border-none rounded-2xl p-5 outline-none"><option>Dog</option><option>Cat</option></select>
+          <select className="w-full bg-slate-50 border-none rounded-2xl p-5 outline-none">{CITIES.map(c => <option key={c}>{c}</option>)}</select>
+          <input placeholder="Breed" className="w-full bg-slate-50 border-none rounded-2xl p-5 outline-none" />
+        </div>
+        <div className="p-16 border-4 border-dashed border-slate-100 rounded-[40px] text-center"><PlusCircle className="mx-auto mb-4 text-slate-200" size={60} /><p className="font-bold text-slate-500">Upload Photos</p></div>
+        <button type="submit" className="w-full bg-pink-500 text-white py-6 rounded-3xl font-black text-2xl shadow-xl hover:scale-105 transition-all">Submit Listing</button>
+      </form>
+    </div>
+  </div>
+);
+
+const SignInPage = ({ setPage }) => (
+  <div className="min-h-[80vh] flex items-center justify-center px-6 py-12 animate-popup">
+    <div className="w-full max-w-md bg-white rounded-[50px] shadow-2xl overflow-hidden border border-pink-50">
+      <div className="bg-pink-500 p-12 text-white text-center">
+        <div className="w-20 h-20 bg-white/20 rounded-3xl flex items-center justify-center mx-auto mb-6 backdrop-blur">
+          <Dog fill="white" size={40} />
+        </div>
+        <h2 className="text-4xl font-black">Welcome Back</h2>
+      </div>
+      <div className="p-12 space-y-4">
+        <button className="w-full border-2 border-slate-100 py-4 rounded-2xl font-bold flex items-center justify-center gap-3"><Globe size={20}/> Continue with Google</button>
+        <button className="w-full border-2 border-slate-100 py-4 rounded-2xl font-bold flex items-center justify-center gap-3"><Mail size={20}/> Continue with Email</button>
+        <button onClick={() => setPage('home')} className="w-full text-pink-500 font-bold mt-4">Return Home</button>
+      </div>
+    </div>
+  </div>
+);
+
+export default function App() {
+  const [currentPage, setPage] = useState('home');
+  const [selectedPet, setSelectedPet] = useState(null);
+
+  useEffect(() => { window.scrollTo(0, 0); }, [currentPage]);
+
+  const renderPage = () => {
+    switch(currentPage) {
+      case 'adopt': return <AdoptPage onSelectPet={setSelectedPet} />;
+      case 'rehome': return <RehomePage />;
+      case 'food': return <FoodPage />;
+      case 'services': return <ServicesPage />;
+      case 'signin': return <SignInPage setPage={setPage} />;
+      default: return <HomePage setPage={setPage} />;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#FFFBFB] text-slate-900 font-sans selection:bg-pink-100">
+      <Navbar currentPage={currentPage} setPage={setPage} />
+      
+      <main className="relative z-10">
+        <ContextualSidebar page={currentPage} />
+        {renderPage()}
+      </main>
+
+      <footer className="bg-white border-t border-pink-50 pt-32 pb-16 px-6">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-16 mb-24">
+          <div className="space-y-8">
+            <div className="flex items-center gap-2">
+              <div className="bg-pink-500 p-2 rounded-xl text-white shadow-lg"><Dog fill="currentColor" size={20} /></div>
+              <span className="text-2xl font-black">Lonelylives</span>
+            </div>
+            <p className="text-slate-500 font-medium">Ethical pet adoption & care in Gujarat.</p>
+            <div className="flex gap-4">
+              <a href="#" className="p-4 bg-pink-50 text-pink-600 rounded-2xl"><Instagram size={24} /></a>
+              <a href="#" className="p-4 bg-blue-50 text-blue-600 rounded-2xl"><Mail size={24} /></a>
+            </div>
+          </div>
+          <div>
+            <h4 className="font-black mb-8 uppercase text-sm">Explore</h4>
+            <ul className="space-y-4 text-slate-500 font-bold">
+              {['home', 'adopt', 'rehome', 'food', 'services'].map(p => (
+                <li key={p} onClick={() => setPage(p)} className="hover:text-pink-500 cursor-pointer flex items-center gap-2 capitalize"><ChevronRight size={16}/> {p}</li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-black mb-8 uppercase text-sm">Support</h4>
+            <p className="text-slate-500 font-bold">+91 93135 29202</p>
+            <p className="text-slate-500 font-bold">bhautikc367@gmail.com</p>
+          </div>
+          <div className="bg-slate-50 p-6 rounded-3xl">
+            <div className="flex items-center gap-2 text-pink-500 mb-2 font-black text-xs"><Zap size={14}/> Gen-UI Active</div>
+            <p className="text-xs text-slate-400 font-medium">Content adapts to your interaction vibe.</p>
+          </div>
+        </div>
+      </footer>
+
+      {selectedPet && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setSelectedPet(null)}></div>
+          <div className="relative bg-white w-full max-w-5xl rounded-[60px] overflow-hidden shadow-2xl flex flex-col md:flex-row animate-popup">
+            <button onClick={() => setSelectedPet(null)} className="absolute top-8 right-8 z-10 bg-white/80 p-3 rounded-full"><X size={24} /></button>
+            <div className="w-full md:w-1/2 h-[400px] md:h-auto"><img src={selectedPet.image} alt={selectedPet.name} className="w-full h-full object-cover" /></div>
+            <div className="p-12 md:w-1/2">
+              <h2 className="text-5xl font-black mb-4">{selectedPet.name}</h2>
+              <p className="text-slate-400 mb-10 text-lg">{selectedPet.breed} • {selectedPet.age}</p>
+              <button className="w-full bg-slate-900 text-white py-6 rounded-3xl font-black text-xl hover:scale-105 transition-all">Contact Owner</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: #FFFBFB; overflow-x: hidden; }
+        @keyframes popup { from { transform: scale(0.9) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+        @keyframes slide-in { from { transform: translateX(50px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .animate-popup { animation: popup 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .animate-slide-in { animation: slide-in 0.6s cubic-bezier(0.165, 0.84, 0.44, 1) forwards; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-thumb { background: #fce7f3; border-radius: 10px; }
+      `}</style>
+    </div>
+  );
+}
